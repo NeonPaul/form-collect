@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Paul Kiddle",
+  "license": "WTFPL",
   "devDependencies": {
     "jest": "^21.2.1"
   }
