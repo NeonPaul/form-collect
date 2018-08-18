@@ -4,7 +4,7 @@ const closest = (el, elName) => {
   return el;
 };
 
-module.exports = function collect(form, submitter) {
+export default function collect(form, submitter) {
   const data = [];
 
   for (field of form.elements) {

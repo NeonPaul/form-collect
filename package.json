@@ -1,13 +1,13 @@
 {
   "name": "form-collect",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Collect form data following the WHATWG form submission algorithm",
   "main": "index.js",
   "module": "index.mjs",
   "scripts": {
-    "test": "jest",
+    "test": "npm run build && jest",
     "rollup": "rollup",
-    "build": "rollup index.js --file index.mjs --format esm",
+    "build": "rollup index.mjs --file index.js --format cjs",
     "prepare": "npm run build"
   },
   "author": "Paul Kiddle",
