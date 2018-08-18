@@ -8,7 +8,13 @@ and back end will recieve the same data sets.
 
 ## How to use
 
+```sh
+npm install form-collect
+```
+
 ```javascript
+const collect = require('form-collect');
+
 // This is the form you want to collect data from
 const form = document.querySelector('#my-form');
 // Optional; this is the button that was clicked to submit the form
