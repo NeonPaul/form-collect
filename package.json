@@ -1,14 +1,14 @@
 {
-  "name": "form",
+  "name": "form-collect",
   "version": "1.0.0",
-  "description": "",
+  "description": "Collect form data following the WHATWG form submission algorithm",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "jest": "^21.2.1"
   }
 }

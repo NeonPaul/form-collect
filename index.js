@@ -1,82 +1,55 @@
-const hasKey = key => ([k]) => k === key;
-const notKey = key => ([k]) => k !== key;
-const hasPair = (key, val) => ([k, v]) => k === key && v == val;
+const isButton = el => /^button|submit|image$/.test(el.type);
+const closest = (el, elName) => {
+  while (el && el.nodeName.toLowerCase() !== elName) el = el.parentNode;
+  return el;
+};
 
-module.exports = class Query {
-  constructor(fields = []) {
-    if (Array.isArray(fields)) {
-      this.fields = fields;
-      return;
+module.exports = function collect(form, submitter) {
+  const data = [];
+
+  for (field of form.elements) {
+    if (
+      closest(field, "datalist") ||
+      field.disabled ||
+      (isButton(field) && field !== submitter) ||
+      (/^(radio|checkbox)$/.test(field.type) && !field.checked) ||
+      (field.type !== "image" && !field.name)
+    ) {
+      continue;
     }
 
-    if (typeof fields === "string") {
-      return Query.fromString(fields);
+    let { name, type } = field;
+
+    if (field.nodeName.toLowerCase() === "input" && type === "image") {
+      name = name ? field.name + "." : "";
+      data.push([name + "x", "0"]);
+      data.push([name + "y", "0"]);
+      continue;
     }
 
-    if (typeof fields === "object") {
-      return Query.fromObject(fields);
+    if (/^select-(one|multiple)$/.test(type)) {
+      for (option of field.options) {
+        if (option.selected && !option.disabled) {
+          data.push([name, option.value]);
+        }
+      }
+    } else if (/^(radio|checkbox)$/.test(type)) {
+      data.push([name, field.value || "on"]);
+    } else if (type === "file") {
+      if (field.files.length) {
+        field.files.forEach(file => data.push([name, file]));
+      } else {
+        data.push([name, ""]);
+      }
+    } else {
+      data.push([name, field.value]);
     }
 
-    throw new TypeError(
-      `Query expects array, string or object, not ${typeof fields}`
-    );
+    let dirname;
+    if ((dirname = field.getAttribute("dirname"))) {
+      data.push([dirname, field.dir === "ltr" ? "ltr" : "rtl"]);
+    }
   }
 
-  static fromString(string) {
-    const fields = string
-      .replace(/^\?/, "")
-      .split("&")
-      .map(seg => seg.split("=").map(decodeURIComponent));
-    return new Query(fields);
-  }
-
-  static fromObject(object) {
-    return new Query(Object.entries(object));
-  }
-
-  append(key, value) {
-    this.fields.push([key, value]);
-  }
-
-  get(key) {
-    return this.fields.find(hasKey(key))[1];
-  }
-
-  getAll(key) {
-    return this.fields.filter(hasKey(key)).map(f => f[0]);
-  }
-
-  delete(key) {
-    this.fields = this.fields.filter(notKey(key));
-  }
-
-  entries() {
-    return this.fields.entries();
-  }
-
-  has(key, value) {
-    return this.fields.some(hasPair(key, value));
-  }
-
-  set(key, [...values]) {
-    this.delete(key);
-    this.fields.concat(values.map(v => [key, v]));
-  }
-
-  [Symbol.iterator]() {
-    return this.fields[Symbol.iterator]();
-  }
-
-  toString() {
-    return (
-      "?" +
-      this.fields
-        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-        .join("&")
-    );
-  }
-
-  toJSON() {
-    return this.fields;
-  }
+  return data;
 };
