@@ -7,7 +7,7 @@ const closest = (el, elName) => {
 export default function collect(form, submitter) {
   const data = [];
 
-  for (field of form.elements) {
+  for (const field of form.elements) {
     if (
       closest(field, "datalist") ||
       field.disabled ||
@@ -28,7 +28,7 @@ export default function collect(form, submitter) {
     }
 
     if (/^select-(one|multiple)$/.test(type)) {
-      for (option of field.options) {
+      for (const option of field.options) {
         if (option.selected && !option.disabled) {
           data.push([name, option.value]);
         }
